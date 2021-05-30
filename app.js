@@ -1,14 +1,21 @@
 const canvas = document.getElementById("jsCanvas");
 const lineWidth = document.getElementById("jsRange");
 const colors = document.getElementsByClassName("jsColor");
+const range = document.getElementById("jsRange");
+const modeBtn = document.getElementById("jsMode");
+
 canvas.width = document.getElementsByClassName("canvas")[0].offsetWidth;
 canvas.height = document.getElementsByClassName("canvas")[0].offsetHeight;
 
+const DEFAULT_COLOR = "#2c2c2c";
+
 let painting = false;
+let filling = false;
 const ctx = canvas.getContext("2d");
 
 // 시작 색상을 검정으로 설정
-ctx.strokeStyle = "#2c2c2c";
+ctx.strokeStyle = DEFAULT_COLOR;
+ctx.fillStyle = DEFAULT_COLOR;
 ctx.lineWidth = lineWidth.value;
 
 const stopPainting = () => (painting = false);
@@ -30,9 +37,31 @@ const handleMouseMove = (event) => {
   }
 };
 
+const fillBackground = () => {
+  if (filling) {
+    ctx.fillRect(0, 0, 700, 700);
+  }
+};
+
 const changeColor = (event) => {
   const color = event.target.style.backgroundColor;
   ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+};
+
+const changeSize = () => {
+  const size = range.value;
+  ctx.lineWidth = size;
+};
+
+const changeMode = () => {
+  if (filling === true) {
+    filling = false;
+    modeBtn.innerText = "채우기";
+  } else {
+    filling = true;
+    modeBtn.innerText = "그리기";
+  }
 };
 
 if (canvas) {
@@ -40,8 +69,18 @@ if (canvas) {
   canvas.addEventListener("mousedown", startPainting);
   canvas.addEventListener("mouseup", stopPainting);
   canvas.addEventListener("mouseleave", stopPainting);
+  canvas.addEventListener("click", fillBackground);
 }
+
 // Array.from() 오브젝트를 Array로 만들어준다
 Array.from(colors).forEach((color) =>
   color.addEventListener("click", changeColor)
 );
+
+if (range) {
+  range.addEventListener("input", changeSize);
+}
+
+if (modeBtn) {
+  modeBtn.addEventListener("click", changeMode);
+}
